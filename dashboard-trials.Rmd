@@ -1,0 +1,110 @@
+---
+title: ""
+author: ""
+date: ""
+output: html_document
+---
+
+```{r message=FALSE, warning=FALSE, include=FALSE, paged.print=FALSE}
+Sys.setlocale("LC_ALL", 'pt_BR.UTF-8')
+library(flexdashboard)
+library(readxl)
+library(tidyverse)
+library(crosstalk)
+library(plotly)
+library(viridis)
+library(rgdal)
+library(ggthemes)
+library(leaflet)
+library(DT)
+
+```
+
+<style>
+            
+               html, body, #map {
+            height: 100%;
+            width: 100%;
+        }      
+        </style>
+
+
+```{r message=FALSE, warning=FALSE, include=FALSE, paged.print=FALSE}
+
+library(crosstalk)
+
+redes3 <- read_excel("redes2.xlsx")
+redes4 <- redes3 %>% 
+  select(Rede, Safra, Sigla,  Município, Estado,  lon, lat) 
+
+library(viridis)
+sd <- SharedData$new(redes4)
+pal <- colorFactor("viridis", domain = c("Giberela", "Brusone"))
+
+```
+
+
+
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE}
+
+bscols(
+  filter_checkbox("Rede", "Escolha a Rede", sd, ~Rede, inline = T),
+filter_slider("Safra", "Intervalo de safras", sd, "Safra"),
+filter_select("Instituição", "Escolha a Instituição", sd, ~Sigla)
+)
+```
+
+##  {.tabset .tabset-fade}
+
+
+### Mapa dos ensaios
+<div id="map">
+```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE}
+
+
+leaflet(sd) %>% 
+addTiles(urlTemplate = "https://mts1.google.com/vt/lyrs=r&hl=en&src=app&x={x}&y={y}&z={z}&s=G", attribution = 'Google') %>% 
+  
+  addCircleMarkers(radius =8,  color = NA, popup = ~Sigla, fillColor =~pal(Rede),fillOpacity = 1, label=~as.character(Sigla)) %>% 
+addLegend("bottomleft", pal = pal, values = ~Rede, title = "Rede",  opacity = 1) %>%  
+  addEasyButton(easyButton(
+    icon="fa-globe", title="Back to initial view",
+    onClick=JS("function(btn, map){ map.setZoom(5); }"))) 
+
+```
+
+</div>
+### Tabela
+```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE}
+datatable(redes4, width="100%",
+    options=list(deferRender=TRUE, scroller=TRUE))
+```
+
+
+### Gráficos ensaios por ano
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE}
+
+
+y <- list(
+  title = "Número de ensaios"
+)
+x <-list(
+  title = "Safra"
+)
+
+sd %>% 
+  plot_ly(x = ~factor(Safra), 
+         color=~Rede,
+      
+          colors = viridis_pal(option = "D")(3)) %>% 
+  layout(barmode = 'dodge',
+         margin=list(l=40,r=40,t=40,b=120),
+         yaxis = y, xaxis=x) 
+  
+
+```
+
+
