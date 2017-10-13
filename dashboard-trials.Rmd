@@ -22,9 +22,11 @@ library(DT)
 
 <style>
             
-               html, body, #map {
+               html, body,  {
             height: 100%;
             width: 100%;
+            margin-top: 40px;
+            padding:30px
         }      
         </style>
 
@@ -46,7 +48,7 @@ pal <- colorFactor("viridis", domain = c("Giberela", "Brusone"))
 
 
 
-
+<br><br>
 ```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE}
 
 bscols(
