@@ -53,7 +53,7 @@ pal <- colorFactor("viridis", domain = c("Giberela", "Brusone"))
 
 bscols(
   filter_checkbox("Rede", "Escolha a Rede", sd, ~Rede, inline = T),
-filter_slider("Safra", "Intervalo de safras", sd, "Safra"),
+filter_select("Safra", "Intervalo de safras", sd, ~Safra),
 filter_select("Instituição", "Escolha a Instituição", sd, ~Sigla)
 )
 ```
